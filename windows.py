@@ -45,7 +45,7 @@ class DSFWindow(Figure):
         self.wells = sorted(self.wtf)
         self.set_well(self.wells[0])
         if wtfit is None:
-            self.wtfit = dict([(key,None) for key in data.keys()])
+            self.wtfit = dict([(key,None) for key in list(data.keys())])
         else:
             self.wtfit = wtfit
         self.well_info = well_info
@@ -113,6 +113,6 @@ class PlateResWindow(Figure):
         if event.dblclick:
             if event.xdata is not None:
                 if 'figCurve' in dir(self):
-                    d2, wells = zip(*[(((array(pt.get_data()).T-array([event.xdata,event.ydata]))**2).sum(1).tolist(),wells.tolist()) for pt,wells in self.pt.values()])
+                    d2, wells = list(zip(*[(((array(pt.get_data()).T-array([event.xdata,event.ydata]))**2).sum(1).tolist(),wells.tolist()) for pt,wells in list(self.pt.values())]))
                     d2, wells = sum(d2,[]), sum(wells,[])
                     self.figCurve.plot_well(wells[argmin(d2)])

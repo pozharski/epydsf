@@ -37,8 +37,8 @@ info        Print information from well info file
     parser.add_argument('--nbro', type=int, default=3, help='Number of cycles of baseline range optimization.')
     parser.add_argument('--tm-guess', type=float, default=50.0, help='Initial estimate of Tm, degrees Celsius')
     parser.add_argument('--basespan', type=float, default=4.0, help='Extent of baseline range, as dT factor')
-    parser.add_argument('--xlabel', type=lambda s: unicode(s, 'utf8'), help='X axis label.')
-    parser.add_argument('--ylabel', type=lambda s: unicode(s, 'utf8'), help='Y axis label.')
+    parser.add_argument('--xlabel', type=lambda s: str(s, 'utf8'), help='X axis label.')
+    parser.add_argument('--ylabel', type=lambda s: str(s, 'utf8'), help='Y axis label.')
     parser.add_argument('--logplot', action='store_true', help='Logarithmic scale plots')
     parser.add_argument('--dry-run', action='store_true', help='Dry run.')
 

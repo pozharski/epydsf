@@ -16,7 +16,7 @@ Train NN to recognize melting points.
 
     args = parser.parse_args()
 
-    from data import baseline, melt
+    from .data import baseline, melt
     from scipy import arange, array
     import random
     random.seed()
@@ -26,7 +26,7 @@ Train NN to recognize melting points.
     t = arange(args.t1,args.t2,args.ht)
     samples = array([[melt([tm,dt]).values(t).tolist()+[tm] for dt in arange(dt1,dt2,ddt)] for tm in arange(tm1,tm2,dtm)])
     samples = samples.reshape((samples.shape[0]*samples.shape[1],samples.shape[2]))
-    print("Training set contains %d curves" % samples.shape[0])
+    print(("Training set contains %d curves" % samples.shape[0]))
     tms = samples[:,-1]
     samples = samples[:,:-1]
     

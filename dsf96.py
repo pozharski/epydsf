@@ -4,6 +4,7 @@ headerhelp = \
 DSF96 performs analysis of a DSF screen in 96-well format
 '''
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
+from functools import reduce
 parser = ArgumentParser(formatter_class=RawDescriptionHelpFormatter,
                         description=headerhelp)
 parser.add_argument('datafile',
@@ -66,18 +67,18 @@ if args.attempt_cp:
     paramscp, fc_cp, g25s_cp, g37s_cp = [], [], [], []
 
 
-cols = sorted(((array(map(int, args.controls.split(',')))*ones([8,2])).T+arange(8)*12).ravel().astype(int))
+cols = sorted(((array(list(map(int, args.controls.split(','))))*ones([8,2])).T+arange(8)*12).ravel().astype(int))
 f = rawx[:,cols]
 Ncols = len(cols)
 cc1 = corrcoef(f.T)
-cc1vals = array(reduce(lambda x,y : x+y, map(lambda k : diag(cc1,k).tolist(), range(1,Ncols))))
+cc1vals = array(reduce(lambda x,y : x+y, [diag(cc1,k).tolist() for k in range(1,Ncols)]))
 cc1m = cc1vals.mean()
 cc1s = cc1vals.std(ddof=1)
-print '|--- Analyze control samples ---|'
-print 'Number of controls: %d' % Ncols
-print 'Average correlation coefficient among control samples (CC1): %.4f' % cc1m
-print 'Standard deviation of CC1: %.2g' % cc1s
-print 'Range of CC1: %.4f - %.4f' % (cc1vals.min(), cc1vals.max())
+print('|--- Analyze control samples ---|')
+print('Number of controls: %d' % Ncols)
+print('Average correlation coefficient among control samples (CC1): %.4f' % cc1m)
+print('Standard deviation of CC1: %.2g' % cc1s)
+print('Range of CC1: %.4f - %.4f' % (cc1vals.min(), cc1vals.max()))
 
 wt = ones(T.shape)
 if args.t1 is not None:
@@ -87,14 +88,14 @@ if args.t2 is not None:
 wt1 = wt
 if args.excludeT is not None:
     for xrng in args.excludeT.split('_'):
-        xt1, xt2 = map(float,xrng.split(','))
+        xt1, xt2 = list(map(float,xrng.split(',')))
         wt = wt*(logical_or(T<=xt1, T>=xt2).astype(float))
 for (col,ff) in enumerate(f.T):
     fopt = linmelt(T, ff, wt)
     for i in range(args.ncyc):
         fopt.fmin()
     params.append(fopt.getp())
-    print "Column %d: " % cols[col] + fopt.report()
+    print("Column %d: " % cols[col] + fopt.report())
     g25s.append(fopt.getG(25))
     g37s.append(fopt.getG(37))
     if args.attempt_cp:
@@ -108,7 +109,7 @@ for (col,ff) in enumerate(f.T):
             fcp.plot(fstyle='b--', dstyle='r.')
             title('Column %d' % cols[col])
             show()
-        print "Column %d: " % cols[col] + fcp.report()
+        print("Column %d: " % cols[col] + fcp.report())
         g25s_cp.append(fcp.getG(25))
         g37s_cp.append(fcp.getG(37))
     if args.subtract_baseline:
@@ -125,14 +126,14 @@ for (col,ff) in enumerate(f.T):
 pm = array(params).mean(0)
 ps = array(params).std(0, ddof=1)
 h = 4*1.98e-3*(273.15+array(params)[:,0])**2/array(params)[:,1]
-print 'Averaged Tm = %.2f +- %.2f' % (pm[0], ps[0])
-print 'Averaged delta T = %.2f +- %.2f' % (pm[1], ps[1])
-print 'Averaged delta H = %.1f +- %.1f' % (h.mean(), h.std(ddof=1))
+print('Averaged Tm = %.2f +- %.2f' % (pm[0], ps[0]))
+print('Averaged delta T = %.2f +- %.2f' % (pm[1], ps[1]))
+print('Averaged delta H = %.1f +- %.1f' % (h.mean(), h.std(ddof=1)))
 g25s = array(g25s)
 g37s = array(g37s)
-print 'Averaged delta G37 = %.1f +- %.1f' % (g37s.mean(), g37s.std(ddof=1))
-print 'Averaged delta G25 = %.1f +- %.1f' % (g25s.mean(), g25s.std(ddof=1))
-print 'Recommended temperature range: %d - %d' % (pm[0]-min(3*pm[1],20), pm[0]+min(3*pm[1],20))
+print('Averaged delta G37 = %.1f +- %.1f' % (g37s.mean(), g37s.std(ddof=1)))
+print('Averaged delta G25 = %.1f +- %.1f' % (g25s.mean(), g25s.std(ddof=1)))
+print('Recommended temperature range: %d - %d' % (pm[0]-min(3*pm[1],20), pm[0]+min(3*pm[1],20)))
 
 cntrl_Tm = pm[0]
 cntrl_sTm = ps[0]
@@ -142,15 +143,15 @@ if args.attempt_cp:
     cp_ps = array(paramscp).std(0, ddof=1)
     cp_h = 4*1.98e-3*(273.15+array(paramscp)[:,0])**2/array(paramscp)[:,1]
     dcp = array(paramscp)[:,2]*cp_h/(273.15+array(paramscp)[:,0])
-    print 'Model adjusted for Cp'
-    print 'Averaged       Tm = %.2f +- %.2f' % (cp_pm[0], cp_ps[0])
-    print 'Averaged delta T  = %.2f +- %.2f' % (cp_pm[1], cp_ps[1])
-    print 'Averaged delta H  = %.1f +- %.1f' % (cp_h.mean(), cp_h.std(ddof=1))
-    print 'Averaged delta Cp = %.1f +- %.1f' % (dcp.mean(), dcp.std(ddof=1))
+    print('Model adjusted for Cp')
+    print('Averaged       Tm = %.2f +- %.2f' % (cp_pm[0], cp_ps[0]))
+    print('Averaged delta T  = %.2f +- %.2f' % (cp_pm[1], cp_ps[1]))
+    print('Averaged delta H  = %.1f +- %.1f' % (cp_h.mean(), cp_h.std(ddof=1)))
+    print('Averaged delta Cp = %.1f +- %.1f' % (dcp.mean(), dcp.std(ddof=1)))
     g25s_cp = array(g25s_cp)
     g37s_cp = array(g37s_cp)
-    print 'Averaged delta G37 = %.1f +- %.1f' % (g37s_cp.mean(), g37s_cp.std(ddof=1))
-    print 'Averaged delta G25 = %.1f +- %.1f' % (g25s_cp.mean(), g25s_cp.std(ddof=1))
+    print('Averaged delta G37 = %.1f +- %.1f' % (g37s_cp.mean(), g37s_cp.std(ddof=1)))
+    print('Averaged delta G25 = %.1f +- %.1f' % (g25s_cp.mean(), g25s_cp.std(ddof=1)))
 
 if not args.text_only:
     cla()
@@ -184,7 +185,7 @@ if not args.text_only:
 
 if not args.just_controls:
     samcols = sorted(set(range(1,97)).difference(cols))
-    ccZ = array(map(lambda k : (corrcoef(rawx[:,k], f.T)[0][1:].mean()-cc1m)/cc1s, samcols))
+    ccZ = array([(corrcoef(rawx[:,k], f.T)[0][1:].mean()-cc1m)/cc1s for k in samcols])
     samvals = []
     for col in ccZ.argsort():
         ff = rawx[:,samcols[col]]
@@ -204,12 +205,12 @@ if not args.just_controls:
             show()
 
     samvals = array(samvals)
-    print "------------------------------------------------------------------"
-    print "|Sample# |     Tm    | Tm shift |    Ztm   |    dT    |    ccZ   |"
-    print "------------------------------------------------------------------"
+    print("------------------------------------------------------------------")
+    print("|Sample# |     Tm    | Tm shift |    Ztm   |    dT    |    ccZ   |")
+    print("------------------------------------------------------------------")
     for col in samvals[:,3].argsort():
-        print '| %6d | %8.2f  | %8.2f | %8.3g | %8.3g | %8.3g |' % tuple(samvals[col,:])
-    print "------------------------------------------------------------------"
+        print('| %6d | %8.2f  | %8.2f | %8.3g | %8.3g | %8.3g |' % tuple(samvals[col,:]))
+    print("------------------------------------------------------------------")
 sys.exit()
 
 title('Average profile')

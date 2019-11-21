@@ -25,7 +25,7 @@ class viia_parser(parser):
             reader = DictReader(lines[i:j], dialect='excel-tab')
             block = dict([(x,[]) for x in reader.fieldnames])
             for row in reader:
-                for key, value in row.iteritems():
+                for key, value in row.items():
                     block[key].append(value)
             self.blocks[blockey] = self.typefix(blockey,block)
     def typefix(self, bname, block):
@@ -75,7 +75,7 @@ class viia_parser(parser):
     def get_all_readings(self, wells=None):
         if wells is None:
             wells = self.get_wells()
-        elif type(wells) in [str,unicode]:
+        elif type(wells) in [str,str]:
             wells = [int(x) for x in wells.split(',')]
         elif type(wells) is not list:
             raise TypeError('Wells could be provided only as a pre-formed list or comma-separated string.')
@@ -92,7 +92,7 @@ class exparser(object):
         self.well_info = {}
         with open(self.fname) as fcsv:
             for row in DictReader(fcsv):
-                row = dict([(k.lower().strip(),v) for k,v in row.items()])
+                row = dict([(k.lower().strip(),v) for k,v in list(row.items())])
                 self.well_info[int(row['well'])] = row
         if expnames is not None:
             if type(expnames) is not list:
@@ -101,17 +101,17 @@ class exparser(object):
         if regexpnames is not None:
             self.regfilter('experiment', regexpnames)
     def filter(self, key, ptrns):
-        self.well_info = dict([(k,v) for k,v in self.well_info.iteritems() if v[key] in ptrns])
+        self.well_info = dict([(k,v) for k,v in self.well_info.items() if v[key] in ptrns])
     def regfilter(self, key, ptrns):
         ptrn = re.compile(ptrns)
-        self.well_info = dict([(k,v) for k,v in self.well_info.iteritems() if ptrn.match(v[key])])
+        self.well_info = dict([(k,v) for k,v in self.well_info.items() if ptrn.match(v[key])])
     def get_wells(self):
-        return self.well_info.keys()
+        return list(self.well_info.keys())
     def get_well_value(self, well, key):
         return self.well_info[well].get(key)
     def set_well_value(self, well, key, value):
         self.well_info[well][key] = value
     def iteritems(self):
-        return self.well_info.iteritems()
+        return iter(self.well_info.items())
     def get_experiments(self):
-        return Counter([v.get('experiment') for k,v in self.well_info.iteritems()])
+        return Counter([v.get('experiment') for k,v in self.well_info.items()])
