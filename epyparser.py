@@ -58,7 +58,7 @@ class viia_parser(parser):
             if mthd == 'str':
                 return [x.strip() for x in values]
             if mthd == 'float':
-                return [float('nan' if x is None else x.translate(None,',')) for x in values]
+                return [float('nan' if x is None else x.translate({44: None})) for x in values]
         return values
     def get_block(self, bname):
         return self.blocks[bname]
@@ -93,7 +93,11 @@ class exparser(object):
         with open(self.fname) as fcsv:
             for row in DictReader(fcsv):
                 row = dict([(k.lower().strip(),v) for k,v in list(row.items())])
-                self.well_info[int(row['well'])] = row
+                try:
+                    self.well_info[int(row['well'])] = row
+                except:
+                    print(row)
+                    raise
         if expnames is not None:
             if type(expnames) is not list:
                 expnames = expnames.split(',')

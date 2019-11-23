@@ -109,7 +109,7 @@ def plate(args):
     print('          Tm = %.1f +- %.1f' % (mtm, stm))
     print('      deltaT = %.1f +- %.1f' % (mdt, sdt))
     if args.csv_wells is not None:
-        x,tm,fmt,wellnum = list(zip(*[(float(v.get('x')),v.get('tm'),v.get('format','ro'),k) for k,v in well_info.items()]))
+        x,tm,fmt,wellnum = list(zip(*[(float(v.get('x')),v.get('tm'),v.get('format','ro'),k) for k,v in well_info.iteritems()]))
         if args.output_file is not None:
             with open(args.output_file,'w') as fout:
                 for xx,yy in zip(*(x,tm)):
@@ -121,7 +121,7 @@ def plate(args):
             fig.set_data({'tm':{'x':x,'y':tm,'format':fmt}, 'wells':wellnum})
         fig.plot('tm', args.logplot)
         if args.ylabel is None:
-            args.ylabel = "Tm, °C".decode("utf8")
+            args.ylabel = "Tm, °C"
         fig.set_axlabels(args.xlabel, args.ylabel)
         fig.canvas.mpl_connect('key_press_event', fig.onkeypress)
         fig.canvas.mpl_connect('button_press_event', fig.onmouseclick)
