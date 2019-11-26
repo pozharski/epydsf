@@ -113,7 +113,7 @@ def plate(args):
         if args.output_file is not None:
             with open(args.output_file,'w') as fout:
                 if args.csv_output:
-                    fout.write('Well,Tm,deltaT\n')
+                    fout.write('Concentration,Tm,deltaT\n')
                     for xx,yy,zz in zip(*(x,tm,dt)):
                         fout.write('%f,%f,%f\n' % (xx,yy,zz))
                 else:
