@@ -109,11 +109,16 @@ def plate(args):
     print('          Tm = %.1f +- %.1f' % (mtm, stm))
     print('      deltaT = %.1f +- %.1f' % (mdt, sdt))
     if args.csv_wells is not None:
-        x,tm,fmt,wellnum = list(zip(*[(float(v.get('x')),v.get('tm'),v.get('format','ro'),k) for k,v in well_info.iteritems()]))
+        x,tm,dt,fmt,wellnum = list(zip(*[(float(v.get('x')),v.get('tm'),v.get('dt'),v.get('format','ro'),k) for k,v in well_info.iteritems()]))
         if args.output_file is not None:
             with open(args.output_file,'w') as fout:
-                for xx,yy in zip(*(x,tm)):
-                    fout.write('%f %f\n' % (xx,yy))
+                if args.csv_output:
+                    fout.write('Well,Tm,deltaT\n')
+                    for xx,yy,zz in zip(*(x,tm,dt)):
+                        fout.write('%f,%f,%f\n' % (xx,yy,zz))
+                else:
+                    for xx,yy in zip(*(x,tm)):
+                        fout.write('%f %f\n' % (xx,yy))
         fig = figure(FigureClass=PlateResWindow)
         if contrflag:
             fig.set_data({'tm':{'x':x,'y':tm,'format':fmt,'my':mtm,'sy':stm}, 'wells':wellnum})
